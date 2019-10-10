@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Computed and Watched properties</title>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+	<span>{{ reverse }}</span>
+</div>
+<div id="app2">
+	<input v-model="firstName"/><br/>
+	<input v-model="lastName"/><br/>
+	<input v-model="fullName"/>
+</div>
+<div id="app3">
+	<input v-model="question"/><br/>
+	{{ answer }}<br/>
+	<img v-bind:src="img">
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+<script type="text/javascript">
+
+	var questionVm = new Vue({
+		el: '#app3',
+		data: {
+			question: '',
+			answer: 'Ask Yes/No question',
+			img: ''
+		},
+		watch: {
+			question: function(oldQuestion, newQuestion) {
+				this.answer = 'Waiting for you to stop !!!';
+				this.debouncedAnswer();
+			}
+		},
+		created: function() {
+			this.debouncedAnswer = _.debounce(this.getAnswer, 1000)
+		},
+		methods: {
+			getAnswer: function() {
+				if(this.question.indexOf('?') === -1) {
+					this.answer = 'Your question should contain ?';
+					return;
+				}
+
+				vm = this;
+				//(this reference) will not return Vue model inside promise.
+				vm.answer = 'Thinking ...';
+				axios.get('https://yesno.wtf/api')
+					.then(function(response) {
+						//console.log('Full response is : ' + JSON.stringify(response));
+						vm.answer = _.capitalize(response.data.answer);
+						vm.img = response.data.image;
+					})
+					.catch(function(err) {
+						console.err('Error occured when calling API : ' + err);
+					});
+			}
+		}
+	});
+
+	var vm = new Vue({
+		el: '#app',
+		data: {
+			hello: 'Hello Text'
+		},
+		computed: {
+			reverse: function() {
+				return this.hello.split('').reverse().join('');
+			}
+		}
+	});
+
+	var app2 = new Vue({
+		el: '#app2',
+		data: {
+			firstName: 'Ibrahim',
+			lastName: 'Abu-Ghosh'
+		},
+		computed: {
+			fullName: {
+				set: function(val) {
+					this.firstName = val.split(' ')[0];
+					this.lastName = val.split(' ')[1];
+				},
+				get: function() {
+					return this.firstName + ' ' + this.lastName;
+				}
+			}
+		}
+	});
+</script>
+</body>
+</html>

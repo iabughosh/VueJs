@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Vue JS</title>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="app">
+	{{ message }}
+</div>
+
+<div id="app2">
+	<span v-bind:title="title" v-if="rendered">
+		Hover to see dynamic title being rendered.
+	</span>
+</div>
+
+<div id="app3">
+	<ol>
+		<li v-for="todo in todos">
+		 Learning order is {{ todo.order }}, Subject is {{ todo.text }}
+		</li>
+	</ol>
+</div>
+
+<div id="app4">
+	<button v-on:click="reverseMessage">Reverse</button><br/>
+	{{ message }}
+</div>
+
+<div id="app5">
+	<ol>
+		<to-do 
+			v-for="item in items"
+			v-bind:item="item"
+			v-bind:key="item.id"/>
+	</ol>
+</div>
+
+<script type="text/javascript">
+
+	Vue.component('to-do', {
+		props: ['item'],
+		template: '<li>{{ item.text }}</li>'
+	});
+	
+	var app = new Vue({
+		el: '#app',
+		data : {
+			message : 'Hello Vue !!!'
+		},
+		created: function() {
+			console.log("App 1 is being created !!!");
+		},
+		destroyed: function() {
+			console.log("App 1 is being destroyed !!!");
+		}
+	});
+
+	var app2 = new Vue({
+		el: '#app2',
+		data: {
+			title: 'This title is generated at ' + new Date().toLocaleString(),
+			rendered: true
+		}
+	});
+
+	var app3 = new Vue({
+		el: '#app3',
+		data: {
+			todos: [
+				{text:'Learn JavaScript', order: 1},
+				{text:'Learn Vue JS', 	  order: 2},
+				{text:'Rock baby !!!', 	  order: 3}
+			]
+		}
+	});
+
+	var app4 = new Vue({
+		el: '#app4',
+		data: {
+			message: 'My Message'
+		},
+		methods: {
+			reverseMessage: function() {
+				this.message = this.message.split(' ').reverse().join(' ')
+			}
+		}
+	});
+
+	var app5 = new Vue({
+		el: '#app5',
+		data: {
+			items:[
+				{text:'15 Big eggs', id: 0},
+				{text:'Milk'   , id: 1},
+				{text:'Break'  , id: 2}
+			]
+		}
+	});
+	
+</script>
+</body>
+</html>
